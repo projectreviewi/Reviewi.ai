@@ -41,17 +41,6 @@ app.get('/api/protected-route', verifyToken, (req, res) => {
     res.json({ msg: 'Access granted to protected route!', user: req.user });
 });
 
-const server = app.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-});
-
-server.on('error', (err) => {
-    if (err.code === 'EADDRINUSE') {
-        console.log(`Port ${PORT} is already in use. Trying another port...`);
-        setTimeout(() => {
-            app.listen(PORT + 1);
-        }, 1000);
-    } else {
-        console.error('Server error:', err);
-    }
 });

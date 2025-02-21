@@ -79,5 +79,8 @@ router.post(
         }
     }
 );
+router.get('/test', (req, res) => {
+    res.json({ msg: 'Authentication API is working' });
+});
 
 module.exports = router;

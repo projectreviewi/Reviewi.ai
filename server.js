@@ -6,19 +6,28 @@ const jwt = require('jsonwebtoken');
 
 const authRoutes = require('./routes/auth');
 const reviewRoutes = require('./routes/review');
-
+const businessRoutes = require('./routes/business');
+const clientsRoutes = require('./routes/clients');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 app.use(cors());
 
-mongoose.connect(process.env.MONGO_URI)
-   .then(() => console.log('MongoDB Connected'))
-   .catch(err => console.error('MongoDB Connection Error:', err));
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+    .then(() => console.log('MongoDB Connected'))
+    .catch(err => {
+        console.error('MongoDB Connection Error:', err);
+        process.exit(1);
+    });
 
 app.use('/api/auth', authRoutes);
 app.use('/api/review', reviewRoutes);
+app.use('/api/business', businessRoutes);
+app.use('/api/clients', clientsRoutes);
 
 app.get('/', (req, res) => {
     res.send('Reviewi.ai Backend is Running!');
@@ -39,6 +48,10 @@ const verifyToken = (req, res, next) => {
 
 app.get('/api/protected-route', verifyToken, (req, res) => {
     res.json({ msg: 'Access granted to protected route!', user: req.user });
+});
+
+app.use((req, res) => {
+    res.status(404).json({ error: 'API route not found' });
 });
 
 app.listen(PORT, () => {

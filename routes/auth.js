@@ -9,8 +9,9 @@ const router = express.Router();
 router.post(
     '/register',
     [
-        body('email').isEmail(),
-        body('password').isLength({ min: 6 }),
+        body('name').not().isEmpty().withMessage('Name is required'),
+        body('email').isEmail().withMessage('Valid email is required'),
+        body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
     ],
     async (req, res) => {
         const errors = validationResult(req);
@@ -18,7 +19,7 @@ router.post(
             return res.status(400).json({ errors: errors.array() });
         }
 
-        const { email, password } = req.body;
+        const { name, email, password } = req.body;
 
         try {
             let user = await User.findOne({ email });
@@ -27,6 +28,7 @@ router.post(
             }
 
             user = new User({
+                name,
                 email,
                 password: await bcrypt.hash(password, 10),
             });
@@ -47,8 +49,8 @@ router.post(
 router.post(
     '/login',
     [
-        body('email').isEmail(),
-        body('password').exists(),
+        body('email').isEmail().withMessage('Valid email is required'),
+        body('password').exists().withMessage('Password is required'),
     ],
     async (req, res) => {
         const errors = validationResult(req);
@@ -79,8 +81,5 @@ router.post(
         }
     }
 );
-router.get('/test', (req, res) => {
-    res.json({ msg: 'Authentication API is working' });
-});
 
 module.exports = router;
